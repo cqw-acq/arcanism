@@ -8,6 +8,7 @@ import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import org.creepebucket.arcanism.items.ManaCell;
 import org.creepebucket.arcanism.items.Wand;
 import org.creepebucket.arcanism.items.WandItemPlaceholder;
 import org.creepebucket.arcanism.spells.PackedSpell;
@@ -27,6 +28,22 @@ public class ModItems {
 
     public static final DeferredItem<PackedSpell> PACKED_SPELL =
             ITEMS.register("packed_spell",          registryName -> new PackedSpell(          stackTo(64, registryName)));
+
+    // =====魔力单元=====
+    public static final DeferredItem<ManaCell> MANA_CELL_SIZE_1 =
+            ITEMS.register("mana_cell_size_1",      registryName -> new ManaCell(            stackTo(1, registryName), 8_000_000.0));
+
+    public static final DeferredItem<ManaCell> MANA_CELL_SIZE_2 =
+            ITEMS.register("mana_cell_size_2",      registryName -> new ManaCell(            stackTo(1, registryName), 64_000_000.0));
+
+    public static final DeferredItem<ManaCell> MANA_CELL_SIZE_3 =
+            ITEMS.register("mana_cell_size_3",      registryName -> new ManaCell(            stackTo(1, registryName), 512_000_000.0));
+
+    public static final DeferredItem<ManaCell> MANA_CELL_SIZE_4 =
+            ITEMS.register("mana_cell_size_4",      registryName -> new ManaCell(            stackTo(1, registryName), 4_096_000_000.0));
+
+    public static final DeferredItem<ManaCell> MANA_CELL_SIZE_5 =
+            ITEMS.register("mana_cell_size_5",      registryName -> new ManaCell(            stackTo(1, registryName), 32_768_000_000.0));
 
     // =====方块物品=====
     public static final DeferredItem<BlockItem> BASIC_MAMA_CONNECTOR_BLOCK_ITEM =

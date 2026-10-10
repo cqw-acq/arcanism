@@ -50,7 +50,7 @@ public abstract class WorldInterationSpell extends SpellItemLogic implements Spe
         public ExecutionResult run(Player caster, SpellSequence spellSequence, List<Object> paramsList, SpellEntity spellEntity) {
             BlockPos pos = spellEntity.blockPosition();
             BlockState state = spellEntity.level().getBlockState(pos);
-            if (state.isAir() || state.getDestroySpeed(spellEntity.level(), pos) < 0) return ExecutionResult.FAILED(this);
+            if (state.isAir() || state.getDestroySpeed(spellEntity.level(), pos) < 0) return ExecutionResult.SUCCESS(this);
             spellEntity.level().destroyBlock(pos, false, caster);
             return ExecutionResult.RETURNED(this, List.of(new ItemStack(state.getBlock().asItem())), List.of(SpellValueType.ITEM));
         }
@@ -75,7 +75,7 @@ public abstract class WorldInterationSpell extends SpellItemLogic implements Spe
             BlockPos pos = spellEntity.blockPosition();
             Level level = spellEntity.level();
             BlockState state = level.getBlockState(pos);
-            if (state.isAir() || state.getDestroySpeed(level, pos) < 0) return ExecutionResult.FAILED(this);
+            if (state.isAir() || state.getDestroySpeed(level, pos) < 0) return ExecutionResult.SUCCESS(this);
             List<ItemStack> drops = Block.getDrops(state, (ServerLevel) level, pos, null, caster, ItemStack.EMPTY);
             level.destroyBlock(pos, false, caster);
             if (drops.isEmpty()) return ExecutionResult.SUCCESS(this);

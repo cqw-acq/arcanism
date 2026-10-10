@@ -2,7 +2,11 @@ package org.creepebucket.arcanism.spells.api;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
+import org.creepebucket.arcanism.gui.lib.api.Color;
 import org.creepebucket.arcanism.spells.SpellValueType;
+import org.creepebucket.arcanism.utils.Mana;
+import org.creepebucket.arcanism.utils.ModColors;
+import org.creepebucket.arcanism.utils.ModUtils;
 
 import java.util.List;
 
@@ -54,8 +58,23 @@ public class SpellExceptions {
     // 编译错误
 
     // 魔力不足
-    public static SpellExceptions NOT_ENOUGH_MANA(SpellItemLogic spell) {
-        return SpellExceptions.RUNTIME(Component.translatable("message.arcanism.error.not_enough_mana"), spell);
+    public static SpellExceptions NOT_ENOUGH_MANA(SpellItemLogic spell, Mana demand, Mana current, double mult) {
+        var d = demand.scale(mult);
+
+        return SpellExceptions.RUNTIME(Component.translatable("message.arcanism.error.not_enough_mana",
+                manaText(d.getRadiation(), ModColors.MAIN_COLOR_R),
+                manaText(d.getTemperature(), ModColors.MAIN_COLOR_T),
+                manaText(d.getMomentum(), ModColors.MAIN_COLOR_M),
+                manaText(d.getPressure(), ModColors.MAIN_COLOR_P),
+                String.format("%.2f", mult),
+                manaText(current.getRadiation(), ModColors.MAIN_COLOR_R),
+                manaText(current.getTemperature(), ModColors.MAIN_COLOR_T),
+                manaText(current.getMomentum(), ModColors.MAIN_COLOR_M),
+                manaText(current.getPressure(), ModColors.MAIN_COLOR_P)), spell);
+    }
+
+    public static Component manaText(double mana, Color color) {
+        return Component.literal(ModUtils.FormattedManaString(mana)).withColor(color.toArgb());
     }
 
     // 运行时错误

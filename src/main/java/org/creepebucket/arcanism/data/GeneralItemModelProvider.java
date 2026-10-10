@@ -31,7 +31,11 @@ public class GeneralItemModelProvider implements DataProvider {
         List<CompletableFuture<?>> futures = new ArrayList<>();
 
         for (String name : List.of(
-                "small_mana_cell",
+                "mana_cell_size_1",
+                "mana_cell_size_2",
+                "mana_cell_size_3",
+                "mana_cell_size_4",
+                "mana_cell_size_5",
                 "rg_alloy_wand",
                 "wand_item_placeholder"
         )) {

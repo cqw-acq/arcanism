@@ -5,6 +5,8 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.entity.player.Player;
+import org.creepebucket.arcanism.registries.ModDataComponents;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -145,5 +147,58 @@ public final class Mana {
     @Override
     public int hashCode() {
         return values.hashCode();
+    }
+
+
+    /**
+     * 从玩家背包（含装备与副手）的魔力组件中按四系各扣 mana：
+     * 每系独立、从各槽位逐个取用，扣多少算多少，返回实扣到的四系魔力。
+     */
+    public static Mana consumeInventoryMana(Player player, double mana) {
+        var drawn = new Mana();
+        var inventory = player.getInventory();
+
+        for (int i = 0; i < inventory.getContainerSize(); i++) {
+            var stack = inventory.getItem(i);
+            var stored = stack.get(ModDataComponents.MANA.get());
+            if (stored == null) continue;
+
+            double r = Math.min(mana - drawn.getRadiation(), stored.current.getRadiation());
+            double t = Math.min(mana - drawn.getTemperature(), stored.current.getTemperature());
+            double m = Math.min(mana - drawn.getMomentum(), stored.current.getMomentum());
+            double p = Math.min(mana - drawn.getPressure(), stored.current.getPressure());
+
+            drawn = drawn.add(new Mana(r, t, m, p));
+            stack.set(ModDataComponents.MANA.get(), new StoredMana(stored.current.subtract(new Mana(r, t, m, p)), stored.capacity));
+        }
+
+        inventory.setChanged();
+        return drawn;
+    }
+
+    /**
+     * 把魔力返还到玩家背包（含装备与副手）的魔力组件：
+     * 每系独立、从各槽位逐个存入，最多存到容量上限，超出部分丢弃。
+     */
+    public static void refundInventoryMana(Player player, Mana mana) {
+        var remaining = mana;
+        var inventory = player.getInventory();
+
+        for (int i = 0; i < inventory.getContainerSize(); i++) {
+            var stack = inventory.getItem(i);
+            var stored = stack.get(ModDataComponents.MANA.get());
+            if (stored == null) continue;
+
+            double r = Math.min(remaining.getRadiation(), stored.capacity.getRadiation() - stored.current.getRadiation());
+            double t = Math.min(remaining.getTemperature(), stored.capacity.getTemperature() - stored.current.getTemperature());
+            double m = Math.min(remaining.getMomentum(), stored.capacity.getMomentum() - stored.current.getMomentum());
+            double p = Math.min(remaining.getPressure(), stored.capacity.getPressure() - stored.current.getPressure());
+            var added = new Mana(r, t, m, p);
+
+            remaining = remaining.subtract(added);
+            stack.set(ModDataComponents.MANA.get(), new StoredMana(stored.current.add(added), stored.capacity));
+        }
+
+        inventory.setChanged();
     }
 }

@@ -369,7 +369,7 @@ public class WandWidgets {
                         ((WandScreen) screen).notificationWidget.addError(exception.message());
                     return false;
                 }
-                ((WandMenu) screen.getMenu()).releaseSpellHook.trigger(chargedTick * ((Wand) ((WandScreen) screen).getMenu().wand.getItem()).getWandValues(((WandScreen) screen).getMenu().wand).chargeRateW * 0.00005, ((WandScreen) screen).bypassCompileWidget.isSelected);
+                ((WandMenu) screen.getMenu()).releaseSpellHook.trigger(chargedTick * ((Wand) ((WandScreen) screen).getMenu().wand.getItem()).getWandValues(((WandScreen) screen).getMenu().wand).chargeRateW / 20, ((WandScreen) screen).bypassCompileWidget.isSelected);
                 chargedTick = 0;
             }
             return false;

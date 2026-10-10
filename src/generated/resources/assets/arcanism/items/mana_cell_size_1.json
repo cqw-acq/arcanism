@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "arcanism:item/small_mana_cell"
+    "model": "arcanism:item/mana_cell_size_1"
   }
 }

@@ -75,6 +75,7 @@ public class SpellReleasePlugin extends BasePlugin {
                 Identifier.fromNamespaceAndPath(MODID, "textures/gui/icons/export.png"), Identifier.fromNamespaceAndPath(MODID, "textures/gui/icons/export.png"),
                 () -> {
                     Minecraft.getInstance().keyboardHandler.setClipboard(ModUtils.serializeSpells(screen.getMenu().storedSpells, Minecraft.getInstance().hasShiftDown()));
+                    screen.notificationWidget.addDebug(Component.translatable("gui.arcanism.wand.errors.export_successful"));
                 }).tooltip(Component.translatable("gui.arcanism.wand.inventory.debugger_export")).addAnimation(new Animation.FadeIn.FromBottom(0.3), 0).color(screen.mainColor));
         editDelete = screen.addWidget(new ImageButtonWidget(fromBottomRight(-64 - 2, -76 - 14), fromTopLeft(16, 16),
                 Identifier.fromNamespaceAndPath(MODID, "textures/gui/icons/trashcan.png"), Identifier.fromNamespaceAndPath(MODID, "textures/gui/icons/trashcan.png"),

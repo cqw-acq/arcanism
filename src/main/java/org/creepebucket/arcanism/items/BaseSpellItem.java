@@ -87,10 +87,15 @@ public class BaseSpellItem extends Item implements ModItemExtensions {
         tooltip.add(Component.translatable("tooltip." + MODID + ".spell_tooltip.description").withStyle(ChatFormatting.LIGHT_PURPLE));
 
         String descBaseKey = "tooltip." + MODID + ".spell." + logic.name + ".";
-        tooltip.add(Component.translatable(descBaseKey + "desc1").withStyle(ChatFormatting.GRAY));
-        tooltip.add(Component.translatable(descBaseKey + "desc2").withStyle(ChatFormatting.GRAY));
+        tooltip.add(Component.literal("    ").append(Component.translatable(descBaseKey + "desc1")).withStyle(ChatFormatting.GRAY));
+        tooltip.add(Component.literal("    ").append(Component.translatable(descBaseKey + "desc2")).withStyle(ChatFormatting.GRAY));
         String desc3Key = descBaseKey + "desc3";
         if (Language.getInstance().has(desc3Key))
-            tooltip.add(Component.translatable(desc3Key).withStyle(ChatFormatting.GRAY));
+            tooltip.add(Component.literal("    ").append(Component.translatable(desc3Key)).withStyle(ChatFormatting.GRAY));
+
+        if (logic instanceof SpellItemLogic.BaseSpell) {
+            tooltip.add(Component.translatable("tooltip." + MODID + ".spell_tooltip.mana_cost").withStyle(ChatFormatting.GOLD));
+            tooltip.add(Component.literal("    ").append(Component.translatable(descBaseKey + "cost")).withStyle(ChatFormatting.GRAY));
+        }
     }
 } 

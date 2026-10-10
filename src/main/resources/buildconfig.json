@@ -93,7 +93,6 @@
       {"from_top_left": [80, 864], "from_bottom_right": [95, 879], "target_img_path": "assets/arcanism/textures/item/spell/get_store.png"},
       {"from_top_left": [96, 864], "from_bottom_right": [111, 879], "target_img_path": "assets/arcanism/textures/item/spell/set_store.png"},
       {"from_top_left": [112, 864], "from_bottom_right": [127, 879], "target_img_path": "assets/arcanism/textures/item/packed_spell_default.png"},
-      {"from_top_left": [208, 128], "from_bottom_right": [223, 143], "target_img_path": "assets/arcanism/textures/item/small_mana_cell.png"},
       {"from_top_left": [112, 0], "from_bottom_right": [127, 15], "target_img_path": "assets/arcanism/textures/item/rg_alloy_wand.png"},
       {"from_top_left": [123, 11], "from_bottom_right": [143, 31], "target_img_path": "assets/arcanism/textures/item/rg_alloy_wand_in_hand.png"},
       {"from_top_left": [96, 160], "from_bottom_right": [111, 175], "target_img_path": "assets/arcanism/textures/item/wand_item_placeholder.png"},
@@ -117,11 +116,11 @@
       {"from_top_left": [0 , 48], "from_bottom_right": [15, 63], "target_img_path": "assets/arcanism/textures/item/wand_plugin_color_theme.png"},
       {"from_top_left": [16, 48], "from_bottom_right": [31, 63], "target_img_path": "assets/arcanism/textures/item/wand_plugin_spell_packer.png"},
       {"from_top_left": [32, 48], "from_bottom_right": [47, 63], "target_img_path": "assets/arcanism/textures/item/wand_plugin_auto_charge.png"},
-      {"from_top_left": [0 , 80], "from_bottom_right": [15, 95], "target_img_path": "assets/arcanism/textures/item/small_mana_cell.png"},
-      {"from_top_left": [16, 80], "from_bottom_right": [31, 95], "target_img_path": "assets/arcanism/textures/item/medium_mana_cell.png"},
-      {"from_top_left": [32, 80], "from_bottom_right": [47, 95], "target_img_path": "assets/arcanism/textures/item/large_mana_cell.png"},
-      {"from_top_left": [48, 80], "from_bottom_right": [63, 95], "target_img_path": "assets/arcanism/textures/item/huge_mana_cell.png"},
-      {"from_top_left": [64, 80], "from_bottom_right": [79, 95], "target_img_path": "assets/arcanism/textures/item/colossal_mana_cell.png"}
+      {"from_top_left": [0 , 80], "from_bottom_right": [15, 95], "target_img_path": "assets/arcanism/textures/item/mana_cell_size_1.png"},
+      {"from_top_left": [16, 80], "from_bottom_right": [31, 95], "target_img_path": "assets/arcanism/textures/item/mana_cell_size_2.png"},
+      {"from_top_left": [32, 80], "from_bottom_right": [47, 95], "target_img_path": "assets/arcanism/textures/item/mana_cell_size_3.png"},
+      {"from_top_left": [48, 80], "from_bottom_right": [63, 95], "target_img_path": "assets/arcanism/textures/item/mana_cell_size_4.png"},
+      {"from_top_left": [64, 80], "from_bottom_right": [79, 95], "target_img_path": "assets/arcanism/textures/item/mana_cell_size_5.png"}
     ],
     "gui_big.png": [
       {"from_top_left": [0, 0], "from_bottom_right": [15, 15], "target_img_path": "assets/arcanism/textures/gui/icons/debugger_spell.png"},

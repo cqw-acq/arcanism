@@ -25,7 +25,6 @@ import org.creepebucket.arcanism.registries.WandPluginRegistry;
 import org.creepebucket.arcanism.spells.SpellCompiler;
 import org.creepebucket.arcanism.spells.SpellEffects;
 import org.creepebucket.arcanism.spells.api.SpellExceptions;
-import org.creepebucket.arcanism.utils.Mana;
 import org.creepebucket.arcanism.utils.ModUtils;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.creepebucket.arcanism.Arcanism.MODID;
+import static org.creepebucket.arcanism.utils.Mana.consumeInventoryMana;
 
 /**
  * 最小魔杖基类：
@@ -146,7 +146,7 @@ public class Wand extends BowItem implements IItemExtension, ModItemExtensions {
         var value = new ModUtils.WandValues();
         for (ItemStack p : plugins) WandPluginRegistry.getPlugin(p.getItem()).adjustWandValues(value, p);
 
-        var mana = value.chargeRateW * (level.getGameTime() - wand.get(ModDataComponents.LAST_RELEASE_TIME.get())) / 20000;
+        var mana = value.chargeRateW * (level.getGameTime() - wand.get(ModDataComponents.LAST_RELEASE_TIME.get())) / 20;
 
         // 编译
         var compiler = new SpellCompiler();
@@ -158,7 +158,13 @@ public class Wand extends BowItem implements IItemExtension, ModItemExtensions {
             return true;
         }
 
-        player.level().addFreshEntity(new SpellEntity(player.level(), (Player) player, compiled, new HashMap<>(), new Mana(mana, mana, mana, mana), plugins, false, new ArrayList<>()));
+        var caster = (Player) player;
+        var drawn = consumeInventoryMana(caster, mana);
+
+        var spell = new SpellEntity(player.level(), caster, compiled, new HashMap<>(), drawn, value.manaMult, plugins, false, new ArrayList<>());
+        spell.setPos(player.getX(), player.getY() + 1.5, player.getZ());
+        player.level().addFreshEntity(spell);
+
         return true;
     }
 

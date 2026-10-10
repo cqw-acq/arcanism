@@ -23,9 +23,11 @@ import org.creepebucket.arcanism.gui.command.NetworkInfoMenu;
 import org.creepebucket.arcanism.mananet.NetNodeBlockEntity;
 import org.creepebucket.arcanism.mananet.NetworkManaManager;
 import org.creepebucket.arcanism.registries.ModAttachments;
+import org.creepebucket.arcanism.registries.ModDataComponents;
 import org.creepebucket.arcanism.spells.SpellCompiler;
 import org.creepebucket.arcanism.utils.Mana;
 import org.creepebucket.arcanism.utils.ModUtils;
+import org.creepebucket.arcanism.utils.StoredMana;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
@@ -106,7 +108,7 @@ public abstract class CommandHandler {
 				return;
 			}
 
-			var entity = new SpellEntity(level, caster, compiled, new HashMap<>(), new Mana(1.0, 1.0, 1.0, 1.0), new ArrayList<>(), false, new ArrayList<>());
+			var entity = new SpellEntity(level, caster, compiled, new HashMap<>(), new Mana(1.0, 1.0, 1.0, 1.0), 0, new ArrayList<>(), false, new ArrayList<>());
 			entity.setPos(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
 
 			if (ctx.getNodes().stream().anyMatch(n -> n.getNode().getName().equals("nbt"))) {
@@ -233,6 +235,61 @@ public abstract class CommandHandler {
 			NetworkManaManager.touch(level, networkId);
 
 			ctx.getSource().sendSuccess(() -> Component.translatable("message.arcanism.command.network_empty", networkId), true);
+		}
+	}
+
+	public static class ItemManaHandler extends CommandHandler {
+
+		public ItemManaHandler() {
+			super("");
+		}
+
+		@Override
+		public ArgumentBuilder<CommandSourceStack, ?> build() {
+			return literal("item")
+				.then(literal("info").executes(ctx -> { handle(ctx); return 1; }))
+				.then(literal("full").executes(ctx -> { handleFull(ctx); return 1; }))
+				.then(literal("empty").executes(ctx -> { handleEmpty(ctx); return 1; }));
+		}
+
+		public StoredMana heldStored(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+			var stored = ctx.getSource().getPlayerOrException().getMainHandItem().get(ModDataComponents.MANA.get());
+			if (stored == null) {
+				ctx.getSource().sendFailure(Component.translatable("message.arcanism.command.not_mana_item"));
+			}
+			return stored;
+		}
+
+		@Override
+		public void handle(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+			StoredMana stored = heldStored(ctx);
+			if (stored == null) return;
+
+			ctx.getSource().sendSuccess(() -> Component.translatable("message.arcanism.command.item_info",
+				ModUtils.FormattedManaString(stored.current.getRadiation()),
+				ModUtils.FormattedManaString(stored.current.getTemperature()),
+				ModUtils.FormattedManaString(stored.current.getMomentum()),
+				ModUtils.FormattedManaString(stored.current.getPressure()),
+				ModUtils.FormattedManaString(stored.capacity.getRadiation()),
+				ModUtils.FormattedManaString(stored.capacity.getTemperature()),
+				ModUtils.FormattedManaString(stored.capacity.getMomentum()),
+				ModUtils.FormattedManaString(stored.capacity.getPressure())), false);
+		}
+
+		public void handleFull(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+			StoredMana stored = heldStored(ctx);
+			if (stored == null) return;
+
+			ctx.getSource().getPlayerOrException().getMainHandItem().set(ModDataComponents.MANA.get(), new StoredMana(stored.capacity, stored.capacity));
+			ctx.getSource().sendSuccess(() -> Component.translatable("message.arcanism.command.item_full"), true);
+		}
+
+		public void handleEmpty(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+			StoredMana stored = heldStored(ctx);
+			if (stored == null) return;
+
+			ctx.getSource().getPlayerOrException().getMainHandItem().set(ModDataComponents.MANA.get(), new StoredMana(new Mana(), stored.capacity));
+			ctx.getSource().sendSuccess(() -> Component.translatable("message.arcanism.command.item_empty"), true);
 		}
 	}
 }

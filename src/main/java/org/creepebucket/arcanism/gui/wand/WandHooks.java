@@ -1,6 +1,5 @@
 package org.creepebucket.arcanism.gui.wand;
 
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -14,17 +13,15 @@ import org.creepebucket.arcanism.registries.SpellRegistry;
 import org.creepebucket.arcanism.spells.PackedSpell;
 import org.creepebucket.arcanism.spells.SpellCompiler;
 import org.creepebucket.arcanism.spells.api.SpellExceptions;
-import org.creepebucket.arcanism.utils.Mana;
 import org.creepebucket.arcanism.utils.ModUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-
-import static net.minecraft.network.chat.Component.literal;
-
 import static net.minecraft.core.component.DataComponents.CUSTOM_NAME;
+import static net.minecraft.network.chat.Component.literal;
+import static org.creepebucket.arcanism.utils.Mana.consumeInventoryMana;
 
 public class WandHooks {
     public static class SaveThemeHook extends Hook {
@@ -238,7 +235,8 @@ public class WandHooks {
             if (menu.spell != null) menu.spell.debugMode = false;
 
             // 生成
-            menu.spell = new SpellEntity(player.level(), player, compiled, new HashMap<>(), new Mana((Double) args[0], (Double) args[0], (Double) args[0], (Double) args[0]), plugins, menu.debugMode, menu.breakpointIds.get());
+            menu.spell = new SpellEntity(player.level(), player, compiled, new HashMap<>(), consumeInventoryMana(player, (Double) args[0]), ModUtils.computeWandValues(plugins).manaMult, plugins, menu.debugMode, menu.breakpointIds.get());
+            menu.spell.setPos(player.getX(), player.getY() + 1.5, player.getZ());
 
             player.level().addFreshEntity(menu.spell);
         }

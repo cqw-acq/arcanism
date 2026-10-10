@@ -6,7 +6,10 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import org.creepebucket.arcanism.gui.lib.api.*;
+import org.creepebucket.arcanism.gui.lib.api.Animation;
+import org.creepebucket.arcanism.gui.lib.api.Color;
+import org.creepebucket.arcanism.gui.lib.api.SmoothedValue;
+import org.creepebucket.arcanism.gui.lib.api.Widget;
 import org.creepebucket.arcanism.gui.lib.ui.Screen;
 import org.creepebucket.arcanism.gui.lib.widgets.*;
 import org.creepebucket.arcanism.registries.ModDataComponents;
@@ -15,10 +18,8 @@ import org.creepebucket.arcanism.registries.WandPluginRegistry;
 import java.util.ArrayList;
 import java.util.List;
 
-
-import static org.creepebucket.arcanism.gui.lib.api.Coordinate.*;
-
 import static org.creepebucket.arcanism.Arcanism.MODID;
+import static org.creepebucket.arcanism.gui.lib.api.Coordinate.*;
 
 public class WandScreen extends Screen<WandMenu> {
 
@@ -84,6 +85,7 @@ public class WandScreen extends Screen<WandMenu> {
         /* ===========插件=========== */
 
         var pluginDy = new SmoothedValue(-(19 + 20 * menu.pluginContainer.getContainerSize()));
+        if(menu.pluginContainer.isEmpty()) pluginDy.target = 7;
 
         var bar = new Widget.BlankWidget(fromTopRight(0, 0), fromTopLeft(120, 0)).dy(pluginDy);
         addTopbar(bar);

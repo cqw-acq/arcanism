@@ -29,6 +29,8 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 
+import static org.creepebucket.arcanism.utils.Mana.refundInventoryMana;
+
 public class SpellEntity extends Entity {
     private static final Logger LOGGER = LoggerFactory.getLogger("ProgrammableMagic:SpellEntity");
     private static final EntityDataAccessor<Boolean> DATA_ACTIVE =
@@ -36,6 +38,8 @@ public class SpellEntity extends Entity {
 
     // 一些数据定义
 
+    // 魔力乘数
+    public double manaMult;
     // 可用的魔力
     public Mana availableMana = new Mana();
     // 插件列表
@@ -63,7 +67,7 @@ public class SpellEntity extends Entity {
         this.setNoGravity(true);
     }
 
-    public SpellEntity(Level level, Player caster, SpellSequence spellSequence, Map<String, Object> spellData, Mana mana, List<ItemStack> plugins, boolean debugMode, List<Integer> breakpointIds) {
+    public SpellEntity(Level level, Player caster, SpellSequence spellSequence, Map<String, Object> spellData, Mana mana, double manaMult, List<ItemStack> plugins, boolean debugMode, List<Integer> breakpointIds) {
         // 创建实体
         this(ModEntityTypes.SPELL_ENTITY.get(), level);
 
@@ -72,12 +76,11 @@ public class SpellEntity extends Entity {
         this.spellSequence = spellSequence;
         this.spellData = spellData;
         this.availableMana = mana;
+        this.manaMult = manaMult;
         this.pluginItems = plugins;
         this.originalSpellSequence = spellSequence.head == null ? new SpellSequence() : spellSequence.subSequence(spellSequence.head, spellSequence.tail);
         this.debugMode = debugMode;
         this.breakpointIds = breakpointIds;
-
-        this.setPos(caster.getX(), caster.getY() + 1.5, caster.getZ());
 
         // 初始化法术指针
         this.currentSpell = spellSequence.head;
@@ -145,6 +148,13 @@ public class SpellEntity extends Entity {
     @Override
     public void onRemoval(RemovalReason reason) {
         super.onRemoval(reason);
+
+        // 返还魔力
+        if (caster != null) {
+            refundInventoryMana(caster, availableMana);
+            availableMana = new Mana();
+        }
+
         if (!(this.level() instanceof ServerLevel serverLevel) || forcedChunkPos == null) return;
         Arcanism.SPELL_ENTITY_TICKET_CONTROLLER.forceChunk(serverLevel, this, forcedChunkPos.x(), forcedChunkPos.z(), false, false);
         forcedChunkPos = null;

@@ -142,8 +142,9 @@ public abstract class SpellItemLogic implements Cloneable {
         if (!canRun(caster, spellSequence, paramsList, spellEntity)) return ExecutionResult.ERRORED();
 
         // 最后检查魔力是否足够
-        if (getScaledManaCost(caster, spellSequence, paramsList, spellEntity).anyGreaterThan(spellEntity.availableMana)) {
-            SpellExceptions.NOT_ENOUGH_MANA(this).throwIt(caster);
+        var demand = getScaledManaCost(caster, spellSequence, paramsList, spellEntity);
+        if (demand.scale(spellEntity.manaMult).anyGreaterThan(spellEntity.availableMana)) {
+            SpellExceptions.NOT_ENOUGH_MANA(this, demand, spellEntity.availableMana, spellEntity.manaMult).throwIt(caster);
             return ExecutionResult.ERRORED();
         }
 

@@ -1,7 +1,15 @@
-// 26.1.2	2026-08-13T22:50:49.528381081	General Item Models
+// 26.1.2	2026-10-10T14:44:06.24016077	General Item Models
+a75c0189233063fa505f68dbcd2d942f1d9b7c54 assets/arcanism/items/mana_cell_size_1.json
+f398141315b96e019b70f6d57c39932fa712e0c2 assets/arcanism/items/mana_cell_size_2.json
+939353b9c78f53c109f28dcb5aaeb925dc60c50f assets/arcanism/items/mana_cell_size_3.json
+89e6e498f0793ed5725ca5e5979add0a9a75fe44 assets/arcanism/items/mana_cell_size_4.json
+28c41464f1a56db7b1a0e43976829c0aaf812c99 assets/arcanism/items/mana_cell_size_5.json
 e1dba185fed73e9448f20fd49534a0c98e73b8cd assets/arcanism/items/rg_alloy_wand.json
-f76508d9c7d9a8c44695fb72bc103302608894a3 assets/arcanism/items/small_mana_cell.json
 2c000f9f6837d13aeb705d54b2943674536291c4 assets/arcanism/items/wand_item_placeholder.json
+288f63885d2699a57c4dc3c9ab8078e315391101 assets/arcanism/models/item/mana_cell_size_1.json
+410c1de1aaa55a284be3d296cba2beb11dcb0632 assets/arcanism/models/item/mana_cell_size_2.json
+e293514c8f9df4e8fa0b4b5e4d8003dcaab8b36b assets/arcanism/models/item/mana_cell_size_3.json
+b993d1fb85097bb23dd87bd6e84e7b522cf5485c assets/arcanism/models/item/mana_cell_size_4.json
+725f42988f9dac7911d4821ad3740ca06ca7a612 assets/arcanism/models/item/mana_cell_size_5.json
 989971183233728ccfe76dc640eac3520b3dd984 assets/arcanism/models/item/rg_alloy_wand.json
-06ecba9ad185b633f9399745824ea82e9cb9d714 assets/arcanism/models/item/small_mana_cell.json
 834638ac11946b7bf0afa3f2401985033fdaf2a3 assets/arcanism/models/item/wand_item_placeholder.json
