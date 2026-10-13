@@ -9,10 +9,7 @@ import org.creepebucket.arcanism.registries.SpellRegistry;
 import org.creepebucket.arcanism.spells.api.SpellExceptions;
 import org.creepebucket.arcanism.spells.api.SpellItemLogic;
 import org.creepebucket.arcanism.spells.api.SpellSequence;
-import org.creepebucket.arcanism.spells.spells_compute.CommaSpell;
-import org.creepebucket.arcanism.spells.spells_compute.NumberDigitSpell;
-import org.creepebucket.arcanism.spells.spells_compute.ParenSpell;
-import org.creepebucket.arcanism.spells.spells_compute.ValueLiteralSpell;
+import org.creepebucket.arcanism.spells.spells_compute.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -20,6 +17,35 @@ import java.util.*;
 import static org.creepebucket.arcanism.spells.SpellValueType.NUMBER;
 
 public class SpellCompiler {
+    public static class SpellAst {
+        public SpellItemLogic spell;
+        public SpellAst lChild, rChild;
+
+        public SpellAst(SpellItemLogic spell, SpellAst lChild, SpellAst rChild) {
+            this.spell = spell;
+            this.lChild = lChild;
+            this.rChild = rChild;
+        }
+
+        public SpellAst(SpellItemLogic spell) {
+            this.spell = spell;
+        }
+
+        @Override
+        public String toString() {
+            return flatten().toString();
+        }
+
+        public SpellSequence flatten() {
+            if (spell == null) return new SpellSequence();
+            var seq = new SpellSequence();
+            if (lChild != null) seq.pushRight(lChild.flatten());
+            if (rChild != null) seq.pushRight(rChild.flatten());
+            seq.pushRight(spell);
+            return seq;
+        }
+    }
+
     public List<SpellExceptions> errors = new ArrayList<>();
     public boolean skipCompile = false, skipCheck = false;
 
@@ -162,6 +188,9 @@ public class SpellCompiler {
 
         if (skipCompile) return rawSequence;
 
+        // 括号等语法检查没过就不进解析
+        if (!errors.isEmpty()) return rawSequence;
+
         // Step 5: 解析法术序列
 
         /*
@@ -185,68 +214,63 @@ public class SpellCompiler {
          *
          */
 
-        // Shitting(?) Yard
-        SpellSequence operatorStack = new SpellSequence();
-        SpellSequence spellsRPN = new SpellSequence();
-
-        // 遍历每个法术
-        for (SpellItemLogic i = rawSequence.head, next; i != null; i = next) {
-            next = i.next;
-
-            // 左括号入栈
-            if (i instanceof ParenSpell.LParenSpell) operatorStack.pushLeft(i);
-
-                // 遇到右括号出栈运算符, 直到遇到左括号
-            else if (i instanceof ParenSpell.RParenSpell) {
-                // 遍历栈
-                for (SpellItemLogic j = operatorStack.head == null ? null : operatorStack.popLeft(); j != null && !(j instanceof ParenSpell.LParenSpell); j = operatorStack.head == null ? null : operatorStack.popLeft())
-                    spellsRPN.pushRight(j);
-            }
-
-            // 如果法术自己想要跳过需要尊重法术意愿
-            else if (i.bypassShunting) {
-                for (SpellItemLogic j = operatorStack.head == null ? null : operatorStack.popLeft(); j != null && !(j instanceof ParenSpell.LParenSpell); j = operatorStack.head == null ? null : operatorStack.popLeft())
-                    spellsRPN.pushRight(j);
-                spellsRPN.pushRight(i);
-            } else if (i instanceof ValueLiteralSpell) spellsRPN.pushRight(i);
-
-            else if (i instanceof CommaSpell) { // 逗号可以分割语句
-                for (SpellItemLogic j = operatorStack.head == null ? null : operatorStack.popLeft(); j != null && !(j instanceof ParenSpell.LParenSpell); j = operatorStack.head == null ? null : operatorStack.popLeft())
-                    spellsRPN.pushRight(j);
-                // 但是逗号不能实际出现在分割后的语句
-            }
-
-            // 如果这个法术没有入参, 当作数值处理
-            else if (i.inputTypes != null && !i.inputTypes.isEmpty() && i.inputTypes.get(0) != null && !i.inputTypes.get(0).isEmpty() && i.inputTypes.get(0).get(0) == SpellValueType.EMPTY) { // 绝对不会NPE(?
-                // 只检查第一个重载的第一个元素, 我们无法区分同时含有无参和有参的法术作为数字还是作为算符
-                spellsRPN.pushRight(i);
-            }
-
-            // 剩下的就全是运算符
-            // 1: i是左结合性 且 当i的优先级比栈顶高
-            // 2: i是右结合性 且 i的优先级大于等于栈顶
-            else if (operatorStack.head == null || (i.precedence > operatorStack.head.precedence) // i > op 总是入栈
-                    || (i.precedence == operatorStack.head.precedence && i.rightConnectivity)) // 情况2
-                operatorStack.pushLeft(i);
-
-                // 否则出栈直到栈头的优先级小于i
-            else {
-                for (SpellItemLogic j = operatorStack.head; !(j instanceof ParenSpell.LParenSpell) && j.precedence >= i.precedence; j = j.next) {
-                    spellsRPN.pushRight(j);
-                    operatorStack.popLeft();
-
-                    // 如果栈空跳出循环
-                    if (operatorStack.head == null) break;
-                }
-                operatorStack.pushLeft(i);
-            }
-        }
-        // 全部出栈
-        while (operatorStack.head != null) spellsRPN.pushRight(operatorStack.popLeft());
+        // Pratt parser
+        var ast = parse(rawSequence, -9999);
 
         // Step 6: 编译后检查
         // TODO: 目前还没有
 
-        return spellsRPN;
+        return ast == null ? new SpellSequence() : ast.flatten();
+    }
+
+    public static SpellAst parse(SpellSequence seq, double min_binding_power) {
+        SpellAst lhs = null, rhs = null;
+
+        var firstSpell = seq.head != null ? seq.popLeft() : null;
+        if (firstSpell instanceof ValueLiteralSpell) {
+            lhs = new SpellAst(firstSpell);
+        } else if (firstSpell instanceof NumberOperationsSpell.SubtractionSpell) {
+            rhs = parse(seq, new NumberOperationsSpell.NegationSpell().precedence);
+            var newSpell = new NumberOperationsSpell.NegationSpell();
+            newSpell.id = firstSpell.id;
+            lhs = new SpellAst(newSpell, rhs, null);
+        } else if (firstSpell instanceof ParenSpell.LParenSpell) {
+            lhs = parse(seq, -9999);
+            if (seq.head instanceof ParenSpell.RParenSpell) seq.popLeft();
+        } else if (firstSpell instanceof CommaSpell || firstSpell instanceof ParenSpell.RParenSpell) {
+            // pass
+        } else if (firstSpell != null && !firstSpell.bypassShunting && firstSpell.inputTypes.get(0).size() == 1) {
+            rhs = parse(seq, firstSpell.precedence);
+            lhs = new SpellAst(firstSpell, rhs, null);
+        } else {
+            lhs = new SpellAst(firstSpell);
+        }
+
+        while (true) {
+            var spell = seq.head;
+            if (spell == null) {
+                break;
+            } else if (spell instanceof ParenSpell.RParenSpell) {
+                break;
+            }
+            double lbp = spell.rightConnectivity ? spell.precedence : spell.precedence + 0.1;
+            double rbp = spell.precedence;
+            if (lbp <= min_binding_power) break;
+
+            // 递归解析右子树
+            seq.popLeft();
+
+            // 处理不同法术
+            if (spell instanceof ValueLiteralSpell || spell instanceof DynamicConstantSpell) {
+                lhs = new SpellAst(spell, lhs, null);
+            } else if (spell.bypassShunting) {
+                lhs = new SpellAst(spell, lhs, null);
+            } else {
+                rhs = parse(seq, rbp);
+                lhs = new SpellAst(spell, lhs, rhs);
+            }
+        }
+
+        return lhs;
     }
 }

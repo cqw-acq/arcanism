@@ -1,5 +1,10 @@
 package org.creepebucket.arcanism.spells.api;
 
+import org.creepebucket.arcanism.spells.spells_compute.ValueLiteralSpell;
+import org.creepebucket.arcanism.utils.ModUtils;
+
+import java.util.Map;
+
 /*
  * 法术链表实现
  */
@@ -175,5 +180,20 @@ public class SpellSequence {
         }
 
         return seq;
+    }
+
+    public String toString() {
+        Map<String, String> map = ModUtils.getSpellSerializeMap();
+        StringBuilder sb = new StringBuilder();
+        for (SpellItemLogic p = head; p != null; p = p.next) {
+            if (p instanceof ValueLiteralSpell literal) {
+                sb.append("<").append(literal.value).append("> ");
+                continue;
+            }
+            String mapped = map.get(p.name);
+            if (mapped == null || mapped.isEmpty()) mapped = p.name;
+            sb.append(mapped.replace("\n", " ")).append(" ");
+        }
+        return sb.toString();
     }
 }

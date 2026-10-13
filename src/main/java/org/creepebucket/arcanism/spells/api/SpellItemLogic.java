@@ -7,9 +7,11 @@ import org.creepebucket.arcanism.entities.SpellEntity;
 import org.creepebucket.arcanism.spells.SpellValueType;
 import org.creepebucket.arcanism.spells.spells_compute.ValueLiteralSpell;
 import org.creepebucket.arcanism.utils.Mana;
+import org.creepebucket.arcanism.utils.ModUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.creepebucket.arcanism.Arcanism.MODID;
 import static org.creepebucket.arcanism.registries.WandPluginRegistry.getPlugin;
@@ -61,6 +63,16 @@ public abstract class SpellItemLogic implements Cloneable {
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
         }
+    }
+
+    @Override
+    public String toString() {
+        if (this instanceof ValueLiteralSpell literal) return "<" + literal.value + ">";
+
+        Map<String, String> map = ModUtils.getSpellSerializeMap();
+        String mapped = map.get(name);
+        if (mapped == null || mapped.isEmpty()) mapped = name;
+        return mapped.replace("\n", " ");
     }
 
     /*

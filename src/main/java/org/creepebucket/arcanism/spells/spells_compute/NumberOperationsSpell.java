@@ -80,6 +80,30 @@ public abstract class NumberOperationsSpell extends SpellItemLogic implements Sp
         }
     }
 
+    // 前缀减号, 编译期识别到一元负号时插入, 不注册为物品
+    public static class NegationSpell extends NumberOperationsSpell {
+        public NegationSpell() {
+            super();
+            name = "negation";
+            inputTypes = List.of(
+                    List.of(SpellValueType.NUMBER),
+                    List.of(SpellValueType.VECTOR3));
+            outputTypes = List.of(List.of(SpellValueType.NUMBER), List.of(SpellValueType.VECTOR3));
+            precedence = 3;
+        }
+
+        @Override
+        public ExecutionResult run(Player caster, SpellSequence spellSequence, List<Object> paramsList, SpellEntity spellEntity) {
+            if (paramsList.get(0) instanceof Double) {
+                return ExecutionResult.RETURNED(this, List.of(-(Double) paramsList.get(0)), List.of(SpellValueType.NUMBER));
+            } else if (paramsList.get(0) instanceof Vec3) {
+                return ExecutionResult.RETURNED(this, List.of(((Vec3) paramsList.get(0)).scale(-1)), List.of(SpellValueType.VECTOR3));
+            }
+            SpellExceptions.INVALID_INPUT(this, List.of(SpellValueType.fromValue(paramsList.get(0))), inputTypes).throwIt(caster);
+            return ExecutionResult.ERRORED();
+        }
+    }
+
     public static class MultiplicationSpell extends NumberOperationsSpell {
         public MultiplicationSpell() {
             super();

@@ -15,6 +15,7 @@ public class CommaSpell extends SpellItemLogic implements SpellItemLogic.Compute
     public CommaSpell() {
         this.name = "comma";
         this.subCategory = "spell." + MODID + ".subcategory.structure";
+        this.bypassShunting = true;
     }
 
     @Override
