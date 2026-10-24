@@ -261,9 +261,7 @@ public class SpellCompiler {
             seq.popLeft();
 
             // 处理不同法术
-            if (spell instanceof ValueLiteralSpell || spell instanceof DynamicConstantSpell) {
-                lhs = new SpellAst(spell, lhs, null);
-            } else if (spell.bypassShunting) {
+            if (spell instanceof ValueLiteralSpell || spell instanceof DynamicConstantSpell || spell.bypassShunting) {
                 lhs = new SpellAst(spell, lhs, null);
             } else {
                 rhs = parse(seq, rbp);
